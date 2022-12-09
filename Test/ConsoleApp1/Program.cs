@@ -629,4 +629,126 @@
     Console.WriteLine($"Day 8 part 2: {highestScenicScore}");
 }
 
+// Day 9 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day9.txt", FileMode.Open));
+    const int numKnots = 2;
+    var knots = new (int x, int y)[numKnots];
+    var tailPositions = new Dictionary<(int x, int y), int> { { (0, 0), 1 } };
+    while (!fr.EndOfStream)
+    {
+        var lineData = fr.ReadLine().Split(' ');
+        var direction = lineData[0];
+        var distance = int.Parse(lineData[1]);
+
+        var delta = direction switch
+        {
+            "L" => (-1, 0),
+            "R" => (1, 0),
+            "U" => (0, -1),
+            "D" => (0, 1),
+            _ => throw new Exception("Can't happen")
+        };
+
+        for (var moveIndex = 0; moveIndex < distance; moveIndex++)
+        {
+            knots[0].Item1 += delta.Item1;
+            knots[0].Item2 += delta.Item2;
+
+            for (var knotIndex = 1; knotIndex < knots.Length; knotIndex++)
+            {
+                if (Math.Abs(knots[knotIndex].Item1 - knots[knotIndex - 1].Item1) > 1 || Math.Abs(knots[knotIndex].Item2 - knots[knotIndex - 1].Item2) > 1)
+                {
+                    if (knots[knotIndex - 1].Item1 != knots[knotIndex].Item1 && knots[knotIndex - 1].Item2 != knots[knotIndex].Item2)
+                    {
+                        knots[knotIndex].Item1 += -Math.Sign(knots[knotIndex].Item1 - knots[knotIndex - 1].Item1);
+                        knots[knotIndex].Item2 += -Math.Sign(knots[knotIndex].Item2 - knots[knotIndex - 1].Item2);
+                    }
+                    else if (Math.Abs(knots[knotIndex].Item1 - knots[knotIndex - 1].Item1) > 1)
+                    {
+                        knots[knotIndex].Item1 += -Math.Sign(knots[knotIndex].Item1 - knots[knotIndex - 1].Item1);
+                    }
+                    else if (Math.Abs(knots[knotIndex].Item2 - knots[knotIndex - 1].Item2) > 1)
+                    {
+                        knots[knotIndex].Item2 += -Math.Sign(knots[knotIndex].Item2 - knots[knotIndex - 1].Item2);
+                    }
+                    if (knotIndex == knots.Length - 1)
+                    {
+                        if (!tailPositions.ContainsKey((knots[knotIndex].Item1, knots[knotIndex].Item2)))
+                        {
+                            tailPositions.Add((knots[knotIndex].Item1, knots[knotIndex].Item2), 0);
+                        }
+
+                        tailPositions[(knots[knotIndex].Item1, knots[knotIndex].Item2)]++;
+                    }
+                }
+            }
+        }
+    }
+    fr.Close();
+
+    Console.WriteLine($"Day 9 part 1: {tailPositions.Count}");
+}
+
+// Day 9 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day9.txt", FileMode.Open));
+    const int numKnots = 10;
+    var knots = new (int x, int y)[numKnots];
+    var tailPositions = new Dictionary<(int x, int y), int> { { (0, 0), 1 } };
+    while (!fr.EndOfStream)
+    {
+        var lineData = fr.ReadLine().Split(' ');
+        var direction = lineData[0];
+        var distance = int.Parse(lineData[1]);
+
+        var delta = direction switch
+        {
+            "L" => (-1, 0),
+            "R" => (1, 0),
+            "U" => (0, -1),
+            "D" => (0, 1),
+            _ => throw new Exception("Can't happen")
+        };
+
+        for (var moveIndex = 0; moveIndex < distance; moveIndex++)
+        {
+            knots[0].Item1 += delta.Item1;
+            knots[0].Item2 += delta.Item2;
+
+            for (var knotIndex = 1; knotIndex < knots.Length; knotIndex++)
+            {
+                if (Math.Abs(knots[knotIndex].Item1 - knots[knotIndex - 1].Item1) > 1 || Math.Abs(knots[knotIndex].Item2 - knots[knotIndex - 1].Item2) > 1)
+                {
+                    if (knots[knotIndex - 1].Item1 != knots[knotIndex].Item1 && knots[knotIndex - 1].Item2 != knots[knotIndex].Item2)
+                    {
+                        knots[knotIndex].Item1 += -Math.Sign(knots[knotIndex].Item1 - knots[knotIndex - 1].Item1);
+                        knots[knotIndex].Item2 += -Math.Sign(knots[knotIndex].Item2 - knots[knotIndex - 1].Item2);
+                    }
+                    else if (Math.Abs(knots[knotIndex].Item1 - knots[knotIndex - 1].Item1) > 1)
+                    {
+                        knots[knotIndex].Item1 += -Math.Sign(knots[knotIndex].Item1 - knots[knotIndex - 1].Item1);
+                    }
+                    else if (Math.Abs(knots[knotIndex].Item2 - knots[knotIndex - 1].Item2) > 1)
+                    {
+                        knots[knotIndex].Item2 += -Math.Sign(knots[knotIndex].Item2 - knots[knotIndex - 1].Item2);
+                    }
+                    if (knotIndex == knots.Length - 1)
+                    {
+                        if (!tailPositions.ContainsKey((knots[knotIndex].Item1, knots[knotIndex].Item2)))
+                        {
+                            tailPositions.Add((knots[knotIndex].Item1, knots[knotIndex].Item2), 0);
+                        }
+
+                        tailPositions[(knots[knotIndex].Item1, knots[knotIndex].Item2)]++;
+                    }
+                }
+            }
+        }
+    }
+    fr.Close();
+
+    Console.WriteLine($"Day 9 part 2: {tailPositions.Count}");
+}
+
 Console.WriteLine("End of program");

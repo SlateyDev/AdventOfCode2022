@@ -751,4 +751,72 @@
     Console.WriteLine($"Day 9 part 2: {tailPositions.Count}");
 }
 
+// Day 10 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day10.txt", FileMode.Open));
+
+    var cycles = 0;
+    var xReg = 1;
+    var signalStrength = 0;
+
+    void handleCycle()
+    {
+        cycles++;
+        if (cycles % 40 != 20 || cycles > 220) return;
+        signalStrength += xReg * cycles;
+    }
+
+    while (!fr.EndOfStream)
+    {
+        var lineData = fr.ReadLine();
+        handleCycle();
+
+        if (lineData == "noop") continue;
+        handleCycle();
+
+        var addVal = int.Parse(lineData.Split(' ')[1]); 
+        xReg += addVal;
+    }
+    fr.Close();
+
+    Console.WriteLine($"Day 10 part 1: {signalStrength}");
+}
+
+// Day 10 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day10.txt", FileMode.Open));
+
+    var cycles = 0;
+    var xReg = 1;
+
+    var lines = new string[6] { "", "", "", "", "", "" };
+
+    void handleCycle()
+    {
+        var col = cycles % 40;
+        var row = cycles / 40;
+        lines[row] += xReg >= col - 1 && xReg <= col + 1 ? "#" : ".";
+        cycles++;
+    }
+
+    while (!fr.EndOfStream)
+    {
+        var lineData = fr.ReadLine();
+        handleCycle();
+
+        if (lineData == "noop") continue;
+        handleCycle();
+
+        var addVal = int.Parse(lineData.Split(' ')[1]); 
+        xReg += addVal;
+    }
+    fr.Close();
+
+    Console.WriteLine("Day 10 part 2:");
+    foreach (var line in lines)
+    {
+        Console.WriteLine(line);
+    }
+}
+
 Console.WriteLine("End of program");

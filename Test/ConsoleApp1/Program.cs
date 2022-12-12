@@ -1,5 +1,64 @@
-﻿// Day 2 (first star answer)
+﻿using ConsoleApp1;
 
+// Day 1 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day1.txt", FileMode.Open));
+
+    var total = 0;
+    var totalCalories = 0;
+    while (!fr.EndOfStream)
+    {
+        var lineData = fr.ReadLine();
+
+        if (lineData.Length == 0)
+        {
+            if (totalCalories > total)
+            {
+                total = totalCalories;
+            }
+            totalCalories = 0;
+            continue;
+        }
+
+        var calories = int.Parse(lineData);
+        totalCalories += calories;
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 1 part 1: {total}");
+}
+
+// Day 1 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day1.txt", FileMode.Open));
+
+    var total = 0;
+    var elvesCalories = new List<int>();
+    var totalCalories = 0;
+    while (!fr.EndOfStream)
+    {
+        var lineData = fr.ReadLine();
+
+        if (lineData.Length == 0)
+        {
+            elvesCalories.Add(totalCalories);
+            totalCalories = 0;
+            continue;
+        }
+
+        var calories = int.Parse(lineData);
+        totalCalories += calories;
+    }
+
+    fr.Close();
+    
+    total = elvesCalories.OrderByDescending(elfCalories => elfCalories).Take(3).Sum();
+
+    Console.WriteLine($"Day 1 part 2: {total}");
+}
+
+// Day 2 (first star answer)
 {
     var fr = new StreamReader(File.Open("input-day2.txt", FileMode.Open));
 
@@ -817,6 +876,141 @@
     {
         Console.WriteLine(line);
     }
+}
+
+// Day 11 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day11.txt", FileMode.Open));
+
+    var monkeys = new Dictionary<int, MonkeyData>();
+
+    while (!fr.EndOfStream)
+    {
+        var monkeyId = int.Parse(fr.ReadLine().Split(' ')[1].Replace(":", ""));
+        var startingItems = fr.ReadLine().Trim().Replace("Starting items: ", "").Split(", ").Select(i => long.Parse(i)).ToList();
+        var operation = fr.ReadLine().Trim().Replace("Operation: ", "").Split(" ").ToList();
+        var operationOperator = operation[3];
+        var operationValue = operation[4];
+        var testDivisor = long.Parse(fr.ReadLine().Trim().Replace("Test: ", "").Split(" ").ToList()[2]);
+        var trueMonkey = int.Parse(fr.ReadLine().Trim().Replace("If true: throw to monkey ", ""));
+        var falseMonkey = int.Parse(fr.ReadLine().Trim().Replace("If false: throw to monkey ", ""));
+        fr.ReadLine();
+        
+        monkeys.Add(monkeyId, new MonkeyData
+        {
+            items = startingItems,
+            operation = operationOperator == "+" ? (x, y) => x + y : (x, y) => x * y,
+            operationValue = operationValue,
+            testDivisor = testDivisor,
+            trueMonkey = trueMonkey,
+            falseMonkey = falseMonkey,
+        });
+    }
+    fr.Close();
+
+    for (var round = 0; round < 20; round++)
+    {
+        foreach (var monkey in monkeys)
+        {
+            while (monkey.Value.items.Count > 0)
+            {
+                monkey.Value.inspections++;
+
+                var inspectionItem = monkey.Value.items[0];
+                monkey.Value.items.RemoveAt(0);
+
+                inspectionItem = monkey.Value.operation(inspectionItem,
+                    monkey.Value.operationValue == "old" ? inspectionItem : long.Parse(monkey.Value.operationValue));
+                inspectionItem /= 3;
+                if (inspectionItem % monkey.Value.testDivisor == 0)
+                {
+                    monkeys[monkey.Value.trueMonkey].items.Add(inspectionItem);
+                }
+                else
+                {
+                    monkeys[monkey.Value.falseMonkey].items.Add(inspectionItem);
+                }
+            }
+        }
+    }
+
+    var answer = monkeys.OrderByDescending(m => m.Value.inspections).Take(2).Aggregate((long)1,
+        (x, y) => x * y.Value.inspections);
+
+    Console.WriteLine($"Day 11 part 1: {answer}");
+}
+
+// Day 11 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day11.txt", FileMode.Open));
+
+    var monkeys = new Dictionary<int, MonkeyData>();
+
+    while (!fr.EndOfStream)
+    {
+        var monkeyId = int.Parse(fr.ReadLine().Split(' ')[1].Replace(":", ""));
+        var startingItems = fr.ReadLine().Trim().Replace("Starting items: ", "").Split(", ").Select(i => long.Parse(i)).ToList();
+        var operation = fr.ReadLine().Trim().Replace("Operation: ", "").Split(" ").ToList();
+        var operationOperator = operation[3];
+        var operationValue = operation[4];
+        var testDivisor = long.Parse(fr.ReadLine().Trim().Replace("Test: ", "").Split(" ").ToList()[2]);
+        var trueMonkey = int.Parse(fr.ReadLine().Trim().Replace("If true: throw to monkey ", ""));
+        var falseMonkey = int.Parse(fr.ReadLine().Trim().Replace("If false: throw to monkey ", ""));
+        fr.ReadLine();
+        
+        monkeys.Add(monkeyId, new MonkeyData
+        {
+            items = startingItems,
+            operation = operationOperator == "+" ? (x, y) => x + y : (x, y) => x * y,
+            operationValue = operationValue,
+            testDivisor = testDivisor,
+            trueMonkey = trueMonkey,
+            falseMonkey = falseMonkey,
+        });
+    }
+    fr.Close();
+
+    //Working out how to manage the extremely large numbers was a fun one!
+    //The only way to properly manage the number not getting too large is by multiplying all of the divisor test numbers
+    //together (due to them all being prime numbers) and using that to modulo the final result.
+    //(2 * 3 * 5 * 7 * 11 * 13 * 17 * 19) / (any one number that was previously multiplied) will be a whole number.
+    //It acts the same as just taking that number out of the multiplication. It doesn't even matter that the test used
+    //all prime numbers other than if we had already used a number that could be divided evenly by another number
+    //already multiplied, we wouldn't need to also multiply by that number. For example, if we had already multiplied by
+    //4, we wouldn't also need to multiply by 2 as 2 is already divisible by a number in the list, it's the equivalent
+    //of (4 * 7 / 2) = (2 * 7). The opposite does not work, it has to be the larger number that is used.
+    var modulo = monkeys.Aggregate((long)1, (x, y) => x * y.Value.testDivisor);
+
+    for (var round = 0; round < 10000; round++)
+    {
+        foreach (var monkey in monkeys)
+        {
+            while (monkey.Value.items.Count > 0)
+            {
+                monkey.Value.inspections++;
+
+                var inspectionItem = monkey.Value.items[0];
+                monkey.Value.items.RemoveAt(0);
+
+                inspectionItem = monkey.Value.operation(inspectionItem,
+                    monkey.Value.operationValue == "old" ? inspectionItem : long.Parse(monkey.Value.operationValue));
+                inspectionItem %= modulo;
+                if (inspectionItem % monkey.Value.testDivisor == 0)
+                {
+                    monkeys[monkey.Value.trueMonkey].items.Add(inspectionItem);
+                }
+                else
+                {
+                    monkeys[monkey.Value.falseMonkey].items.Add(inspectionItem);
+                }
+            }
+        }
+    }
+
+    var answer = monkeys.OrderByDescending(m => m.Value.inspections).Take(2).Aggregate((long)1,
+        (x, y) => x * y.Value.inspections);
+
+    Console.WriteLine($"Day 11 part 2: {answer}");
 }
 
 Console.WriteLine("End of program");

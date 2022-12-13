@@ -1162,6 +1162,10 @@ void Day12OutputPath(char[][] data, List<PathFinderCell> path)
     List<PathFinderCell> path = null;
     foreach (var startLocation in possibleStartLocations)
     {
+        foreach (var cell in cells)
+        {
+            cell.Distance = int.MaxValue;
+        }
         var newPathOut = Day12GetPath(cells, startLocation, exitLocation);
         if (newPathOut != null && (path == null || newPathOut.Count < path.Count))
         {

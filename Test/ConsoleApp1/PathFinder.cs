@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-
-public class PathFinder
+﻿public class PathFinder
 {
     public int maxUpElevationDifference = 1;
     public int maxDownElevationDifference = 1000;
-    // public int hillCost = 1;
     private PathFinderPriorityQueue _searchFrontier;
     
     public Stack<PathFinderCell> Search(List<PathFinderCell> cells, PathFinderCell sourceCell, PathFinderCell destCell)
@@ -52,7 +47,6 @@ public class PathFinder
                 if (currentCell.Elevation - neighbor.Elevation > maxDownElevationDifference) continue;
 
                 var distance = currentCell.Distance + 1;
-                // distance += Math.Abs(neighbor.Elevation - currentCell.Elevation) * upElevationCost;
                 if (distance >= neighbor.Distance) continue;
 
                 if (neighbor.Distance == int.MaxValue)

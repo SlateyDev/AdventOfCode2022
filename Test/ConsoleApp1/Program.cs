@@ -1123,7 +1123,7 @@ void Day12OutputPath(char[][] data, List<PathFinderCell> path)
 
     var cells = Day12GenerateCells(data);
     var path = Day12GetPath(cells, startLocation, exitLocation);
-    Day12OutputPath(data, path);
+    // Day12OutputPath(data, path);
 
     Console.WriteLine($"Day 12 part 1: {path.Count}");
 }
@@ -1172,9 +1172,42 @@ void Day12OutputPath(char[][] data, List<PathFinderCell> path)
             path = newPathOut;
         }
     }
-    Day12OutputPath(data, path);
+    // Day12OutputPath(data, path);
     
     Console.WriteLine($"Day 12 part 2: {path.Count}");
+}
+
+// Day 13 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day13.txt", FileMode.Open));
+
+    
+    while (!fr.EndOfStream)
+    {
+        var data1 = fr.ReadLine();
+        var data2 = fr.ReadLine();
+        var left = new SignalData(data1);
+        var right = new SignalData(data2);
+
+        fr.ReadLine();
+    }
+
+    fr.Close();
+
+
+    Console.WriteLine($"Day 13 part 1: {0}");
+}
+
+// Day 13 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day13.txt", FileMode.Open));
+
+    var data = fr.ReadToEnd().Split("\n", StringSplitOptions.RemoveEmptyEntries).Select(i => i.ToArray()).ToArray();
+
+    fr.Close();
+
+    
+    Console.WriteLine($"Day 13 part 2: {0}");
 }
 
 Console.WriteLine("End of program");

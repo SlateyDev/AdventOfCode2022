@@ -1013,4 +1013,164 @@
     Console.WriteLine($"Day 11 part 2: {answer}");
 }
 
+List<PathFinderCell> Day12GenerateCells(char[][] data)
+{
+    var cells = new List<PathFinderCell>();
+
+    for (var y = 0; y < data.GetLength(0); y++)
+    {
+        for (var x = 0; x < data[0].Length; x++)
+        {
+            var cell = new PathFinderCell();
+            cell.X = x;
+            cell.Y = y;
+            cell.Elevation = data[y][x] switch
+            {
+                'S' => 'a' - 1,
+                'E' => 'z' + 1,
+                _ => data[y][x]
+            };
+            cells.Add(cell);
+        }
+    }
+
+    for (var y = 0; y < data.GetLength(0); y++)
+    {
+        for (var x = 0; x < data[0].Length; x++)
+        {
+            var currentCell = cells.Find(c => c.X == x && c.Y == y);
+
+            var deltas = new List<(int x, int y)> { (-1, 0), (1, 0), (0, -1), (0, 1) };
+            foreach (var delta in deltas)
+            {
+                var neighborX = x + delta.x;
+                var neighborY = y + delta.y;
+                if (neighborX < 0 || neighborX >= data[0].Length || neighborY < 0 ||
+                    neighborY >= data.GetLength(0)) continue;
+
+                var neighbor = cells.Find(c => c.X == neighborX && c.Y == neighborY);
+
+                currentCell.Neighbors.Add(neighbor);
+            }
+        }
+    }
+
+    return cells;
+}
+
+List<PathFinderCell> Day12GetPath(List<PathFinderCell> cells, (int x, int y) startLocation, (int x, int y) exitLocation)
+{
+    var pathFinder = new PathFinder();
+    var path = pathFinder.Search(cells, cells.Find(c => c.X == startLocation.x && c.Y == startLocation.y),
+        cells.Find(c => c.X == exitLocation.x && c.Y == exitLocation.y));
+
+    return path?.ToList();
+}
+
+void Day12OutputPath(char[][] data, List<PathFinderCell> path)
+{
+    for (int y = 0; y < data.GetLength(0); y++)
+    {
+        for (int x = 0; x < data[0].Length; x++)
+        {
+            if (path?.Find(c => c.X == x && c.Y == y) != null)
+            {
+                Console.BackgroundColor = ConsoleColor.Green;
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+            else
+            {
+                Console.BackgroundColor = ConsoleColor.Black;
+                Console.ForegroundColor = ConsoleColor.Gray;
+            }
+
+            Console.Write(data[y][x]);
+        }
+        Console.WriteLine();
+    }
+}
+
+// Day 12 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day12.txt", FileMode.Open));
+
+    var data = fr.ReadToEnd().Split("\n", StringSplitOptions.RemoveEmptyEntries).Select(i => i.ToArray()).ToArray();
+
+    fr.Close();
+
+    (int x, int y) startLocation = (-1, -1);
+    (int x, int y) exitLocation = (-1, -1);
+
+    for (var y = 0; y < data.GetLength(0); y++)
+    {
+        for (var x = 0; x < data[0].Length; x++)
+        {
+            switch (data[y][x])
+            {
+                case 'S':
+                    startLocation = (x, y);
+                    break;
+                case 'E':
+                    exitLocation = (x, y);
+                    break;
+            }
+
+            if (startLocation != (-1, -1) && exitLocation != (-1, -1)) break;
+        }
+
+        if (startLocation != (-1, -1) && exitLocation != (-1, -1)) break;
+    }
+
+    var cells = Day12GenerateCells(data);
+    var path = Day12GetPath(cells, startLocation, exitLocation);
+    Day12OutputPath(data, path);
+
+    Console.WriteLine($"Day 12 part 1: {path.Count}");
+}
+
+// Day 12 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day12.txt", FileMode.Open));
+
+    var data = fr.ReadToEnd().Split("\n", StringSplitOptions.RemoveEmptyEntries).Select(i => i.ToArray()).ToArray();
+
+    fr.Close();
+
+    var possibleStartLocations = new List<(int x, int y)>();
+    (int x, int y) exitLocation = (-1, -1);
+
+    for (var y = 0; y < data.GetLength(0); y++)
+    {
+        for (var x = 0; x < data[0].Length; x++)
+        {
+            switch (data[y][x])
+            {
+                case 'a':
+                    if (x == 0)
+                    {
+                        possibleStartLocations.Add((x, y));
+                    }
+                    break;
+                case 'E':
+                    exitLocation = (x, y);
+                    break;
+            }
+        }
+    }
+
+    var cells = Day12GenerateCells(data);
+    List<PathFinderCell> path = null;
+    foreach (var startLocation in possibleStartLocations)
+    {
+        var newPathOut = Day12GetPath(cells, startLocation, exitLocation);
+        if (newPathOut != null && (path == null || newPathOut.Count < path.Count))
+        {
+            path = newPathOut;
+        }
+    }
+    Day12OutputPath(data, path);
+    
+    Console.WriteLine($"Day 12 part 2: {path.Count}");
+}
+
 Console.WriteLine("End of program");

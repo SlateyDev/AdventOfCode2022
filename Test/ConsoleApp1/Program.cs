@@ -1,4 +1,5 @@
-﻿using ConsoleApp1;
+﻿using System.Text.Json.Nodes;
+using ConsoleApp1;
 
 // Day 1 (first star answer)
 {
@@ -1177,37 +1178,110 @@ void Day12OutputPath(char[][] data, List<PathFinderCell> path)
     Console.WriteLine($"Day 12 part 2: {path.Count}");
 }
 
+int Day13PacketCompare(object left, object right)
+{
+    while (true)
+    {
+        switch (left)
+        {
+            case int lv when right is int rv:
+                return lv - rv;
+            case List<object> lv when right is int rv:
+                left = lv;
+                right = new List<object> { rv };
+                continue;
+            case int lv when right is List<object> rv:
+                left = new List<object> { lv };
+                right = rv;
+                continue;
+        }
+
+        {
+            var lv = left as List<object>;
+            var rv = right as List<object>;
+            if (lv.Count == 0 && rv.Count != 0) return -1;
+            if (lv.Count != 0 && rv.Count == 0) return 1;
+            if (lv.Count == 0 && rv.Count == 0) return 0;
+
+            var itemCompare = Day13PacketCompare(lv[0], rv[0]);
+            if (itemCompare != 0) return itemCompare;
+            left = lv.Skip(1).ToList();
+            right = rv.Skip(1).ToList();
+        }
+    }
+}
+
+//This is just to make things easier to pass to my comparison function. I couldn't otherwise figure out
+//the code easily enough to pass part of an array on to the recursive call again as it was defined as a
+//JsonArray or JsonElement. I tried several different ways but had problems so just created a function
+//to convert it to an object.
+object JsonToObject(JsonNode node)
+{
+    if (node is not JsonArray) return node.AsValue().GetValue<int>();
+    return node.AsArray().Select(JsonToObject).ToList();
+}
+
 // Day 13 (first star answer)
 {
     var fr = new StreamReader(File.Open("input-day13.txt", FileMode.Open));
 
-    
+    var index = 1;
+    var total = 0;
     while (!fr.EndOfStream)
     {
         var data1 = fr.ReadLine();
         var data2 = fr.ReadLine();
-        var left = new SignalData(data1);
-        var right = new SignalData(data2);
-
         fr.ReadLine();
+
+        var left = JsonToObject(JsonNode.Parse(data1));
+        var right = JsonToObject(JsonNode.Parse(data2));
+
+        if (Day13PacketCompare(left, right) < 0)
+        {
+            total += index;
+        }
+        
+        index++;
     }
 
     fr.Close();
 
 
-    Console.WriteLine($"Day 13 part 1: {0}");
+    Console.WriteLine($"Day 13 part 1: {total}");
 }
 
 // Day 13 (second star answer)
 {
     var fr = new StreamReader(File.Open("input-day13.txt", FileMode.Open));
 
-    var data = fr.ReadToEnd().Split("\n", StringSplitOptions.RemoveEmptyEntries).Select(i => i.ToArray()).ToArray();
+    var packets = new List<(string, object)>();
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+        if (data.Length == 0) continue;
+        var dataPacket = JsonToObject(JsonNode.Parse(data));
+        
+        packets.Add((data, dataPacket));
+    }
 
     fr.Close();
 
+    var testPackets = new List<string> { "[[2]]", "[[6]]" };
+    foreach (var testPacket in testPackets)
+    {
+        packets.Add((testPacket, JsonToObject(JsonNode.Parse(testPacket))));
+    }
     
-    Console.WriteLine($"Day 13 part 2: {0}");
+    packets.Sort((left, right) => (Day13PacketCompare(left.Item2, right.Item2)));
+
+    var total = 1;
+    foreach (var testPacket in testPackets)
+    {
+        total *= packets.FindIndex(p => p.Item1 == testPacket) + 1;
+    }
+    
+    Console.WriteLine($"Day 13 part 2: {total}");
 }
 
 Console.WriteLine("End of program");

@@ -1288,30 +1288,202 @@ object JsonToObject(JsonNode node)
 {
     var fr = new StreamReader(File.Open("input-day14.txt", FileMode.Open));
 
+    var linesGroups = new List<List<int[]>>();
     while (!fr.EndOfStream)
     {
         var data = fr.ReadLine();
 
+        linesGroups.Add(data.Split(" -> ").Select(lp => lp.Split(",").Select(int.Parse).ToArray()).ToList());
     }
 
     fr.Close();
 
-    Console.WriteLine($"Day 14 part 1: {0}");
+
+    var minX = linesGroups.SelectMany(i => i).Min(i => i[0]);
+    var minY = 0;// linesGroups.SelectMany(i => i).Min(i => i[1]);
+    var maxX = linesGroups.SelectMany(i => i).Max(i => i[0]);
+    var maxY = linesGroups.SelectMany(i => i).Max(i => i[1]);
+    
+    var grid = new char[maxY-minY + 1, maxX-minX + 1];
+
+    foreach (var lineGroup in linesGroups)
+    {
+        var startLine = lineGroup[0];
+        foreach (var nextline in lineGroup.Skip(1))
+        {
+            var linePos = startLine;
+
+            grid[startLine[1] - minY, startLine[0] - minX] = '#';
+
+            while (linePos[0] != nextline[0] || linePos[1] != nextline[1])
+            {
+                linePos[0] += Math.Sign(nextline[0] - linePos[0]);
+                linePos[1] += Math.Sign(nextline[1] - linePos[1]);
+
+                grid[linePos[1] - minY, linePos[0] - minX] = '#';
+            }
+            
+            startLine = nextline;
+        }
+    }
+
+    var simulating = true;
+    var resting_sand = 0;
+    while (simulating)
+    {
+        var sandpoint = new[] { 500, minY };
+
+        while (true)
+        {
+            if (sandpoint[1] >= maxY)
+            {
+                simulating = false;
+                break;
+            }
+
+            if (grid[sandpoint[1] - minY + 1, sandpoint[0] - minX] == 0)
+            {
+                sandpoint[1]++;
+            }
+            else if (grid[sandpoint[1] - minY + 1, sandpoint[0] - minX - 1] == 0)
+            {
+                sandpoint[1]++;
+                sandpoint[0]--;
+            }
+            else if (grid[sandpoint[1] - minY + 1, sandpoint[0] - minX + 1] == 0)
+            {
+                sandpoint[1]++;
+                sandpoint[0]++;
+            }
+            else
+            {
+                resting_sand++;
+                grid[sandpoint[1] - minY, sandpoint[0] - minX] = 'O';
+
+                break;
+            }
+        }
+    }
+
+    // for (var y = 0; y < maxY - minY; y++)
+    // {
+    //     for (var x = 0; x < maxX - minX; x++)
+    //     {
+    //         if (grid[y, x] != 0)
+    //         {
+    //             Console.Write(grid[y,x]);
+    //         }
+    //         else
+    //         {
+    //             Console.Write(".");
+    //         }
+    //     }
+    //     Console.WriteLine();
+    // }
+
+    Console.WriteLine($"Day 14 part 1: {resting_sand}");
 }
 
 // Day 14 (second star answer)
 {
     var fr = new StreamReader(File.Open("input-day14.txt", FileMode.Open));
 
+    var linesGroups = new List<List<int[]>>();
     while (!fr.EndOfStream)
     {
         var data = fr.ReadLine();
 
+        linesGroups.Add(data.Split(" -> ").Select(lp => lp.Split(",").Select(int.Parse).ToArray()).ToList());
     }
 
     fr.Close();
     
-    Console.WriteLine($"Day 14 part 2: {0}");
+    var maxY = linesGroups.SelectMany(i => i).Max(i => i[1]);
+    
+    var grid = new Dictionary<(int x, int y), char>();
+
+    foreach (var lineGroup in linesGroups)
+    {
+        var startLine = lineGroup[0];
+        foreach (var nextline in lineGroup.Skip(1))
+        {
+            var linePos = startLine;
+
+            if (!grid.ContainsKey((startLine[0], startLine[1]))) grid.Add((startLine[0], startLine[1]), '#');
+
+            while (linePos[0] != nextline[0] || linePos[1] != nextline[1])
+            {
+                linePos[0] += Math.Sign(nextline[0] - linePos[0]);
+                linePos[1] += Math.Sign(nextline[1] - linePos[1]);
+
+                if (!grid.ContainsKey((linePos[0], linePos[1]))) grid.Add((linePos[0], linePos[1]), '#');
+            }
+            
+            startLine = nextline;
+        }
+    }
+
+    var simulating = true;
+    var resting_sand = 0;
+    while (simulating)
+    {
+        var sandPoint = new[] { 500, 0 };
+        
+        if (grid.ContainsKey((sandPoint[0], sandPoint[1])))
+        {
+            simulating = false;
+            break;
+        }
+
+        while (true)
+        {
+            if (sandPoint[1] > maxY)
+            {
+                resting_sand++;
+                grid.Add((sandPoint[0], sandPoint[1]), 'O');
+                break;
+            }
+
+            if (!grid.ContainsKey((sandPoint[0], sandPoint[1] + 1)))
+            {
+                sandPoint[1]++;
+            }
+            else if (!grid.ContainsKey((sandPoint[0] - 1, sandPoint[1] + 1)))
+            {
+                sandPoint[1]++;
+                sandPoint[0]--;
+            }
+            else if (!grid.ContainsKey((sandPoint[0] + 1, sandPoint[1] + 1)))
+            {
+                sandPoint[1]++;
+                sandPoint[0]++;
+            }
+            else
+            {
+                resting_sand++;
+                grid.Add((sandPoint[0], sandPoint[1]), 'O');
+                break;
+            }
+        }
+    }
+
+    // for (var y = 0; y < maxY - minY; y++)
+    // {
+    //     for (var x = 0; x < maxX - minX; x++)
+    //     {
+    //         if (grid[y, x] != 0)
+    //         {
+    //             Console.Write(grid[y,x]);
+    //         }
+    //         else
+    //         {
+    //             Console.Write(".");
+    //         }
+    //     }
+    //     Console.WriteLine();
+    // }
+    
+    Console.WriteLine($"Day 14 part 2: {resting_sand}");
 }
 
 // Day 15 (first star answer)

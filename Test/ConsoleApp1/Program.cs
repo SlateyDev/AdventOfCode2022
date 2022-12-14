@@ -1314,4 +1314,334 @@ object JsonToObject(JsonNode node)
     Console.WriteLine($"Day 14 part 2: {0}");
 }
 
+// Day 15 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day15.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 15 part 1: {0}");
+}
+
+// Day 15 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day15.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 15 part 2: {0}");
+}
+
+// Day 16 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day16.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 16 part 1: {0}");
+}
+
+// Day 16 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day16.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 16 part 2: {0}");
+}
+
+// Day 17 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day17.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 17 part 1: {0}");
+}
+
+// Day 17 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day17.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 17 part 2: {0}");
+}
+
+// Day 18 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day18.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 18 part 1: {0}");
+}
+
+// Day 18 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day18.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 18 part 2: {0}");
+}
+
+// Day 19 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day19.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 19 part 1: {0}");
+}
+
+// Day 19 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day19.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 19 part 2: {0}");
+}
+
+// Day 20 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day20.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 20 part 1: {0}");
+}
+
+// Day 20 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day20.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 20 part 2: {0}");
+}
+
+// Day 21 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day21.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 21 part 1: {0}");
+}
+
+// Day 21 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day21.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 21 part 2: {0}");
+}
+
+// Day 22 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day22.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 22 part 1: {0}");
+}
+
+// Day 22 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day22.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 22 part 2: {0}");
+}
+
+// Day 23 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day23.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 23 part 1: {0}");
+}
+
+// Day 23 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day23.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 23 part 2: {0}");
+}
+
+// Day 24 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day24.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 24 part 1: {0}");
+}
+
+// Day 24 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day24.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 24 part 2: {0}");
+}
+
+// Day 25 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day25.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 25 part 1: {0}");
+}
+
+// Day 25 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day25.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 25 part 2: {0}");
+}
+
 Console.WriteLine("End of program");

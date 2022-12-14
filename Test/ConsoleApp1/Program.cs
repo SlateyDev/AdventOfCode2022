@@ -1284,4 +1284,34 @@ object JsonToObject(JsonNode node)
     Console.WriteLine($"Day 13 part 2: {total}");
 }
 
+// Day 14 (first star answer)
+{
+    var fr = new StreamReader(File.Open("input-day14.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+
+    Console.WriteLine($"Day 14 part 1: {0}");
+}
+
+// Day 14 (second star answer)
+{
+    var fr = new StreamReader(File.Open("input-day14.txt", FileMode.Open));
+
+    while (!fr.EndOfStream)
+    {
+        var data = fr.ReadLine();
+
+    }
+
+    fr.Close();
+    
+    Console.WriteLine($"Day 14 part 2: {0}");
+}
+
 Console.WriteLine("End of program");

@@ -1492,10 +1492,27 @@ object JsonToObject(JsonNode node)
 
     var sensors = new List<(int x, int y)>();
     var beacons = new List<(int x, int y)>();
+    var testPosition = 2000000;
 
+    // var testData = (string[])("Sensor at x=2, y=18: closest beacon is at x=-2, y=15\n" +
+    //     "Sensor at x=9, y=16: closest beacon is at x=10, y=16\n" +
+    //     "Sensor at x=13, y=2: closest beacon is at x=15, y=3\n" +
+    //     "Sensor at x=12, y=14: closest beacon is at x=10, y=16\n" +
+    //     "Sensor at x=10, y=20: closest beacon is at x=10, y=16\n" +
+    //     "Sensor at x=14, y=17: closest beacon is at x=10, y=16\n" +
+    //     "Sensor at x=8, y=7: closest beacon is at x=2, y=10\n" +
+    //     "Sensor at x=2, y=0: closest beacon is at x=2, y=10\n" +
+    //     "Sensor at x=0, y=11: closest beacon is at x=2, y=10\n" +
+    //     "Sensor at x=20, y=14: closest beacon is at x=25, y=17\n" +
+    //     "Sensor at x=17, y=20: closest beacon is at x=21, y=22\n" +
+    //     "Sensor at x=16, y=7: closest beacon is at x=15, y=3\n" +
+    //     "Sensor at x=14, y=3: closest beacon is at x=15, y=3\n" +
+    //     "Sensor at x=20, y=1: closest beacon is at x=15, y=3").Split("\n", StringSplitOptions.TrimEntries);
     while (!fr.EndOfStream)
+    //foreach(var t in testData)
     {
        var data = fr.ReadLine();
+       //var data = t;
 
        data = data.Replace("Sensor at x=", "");
        data = data.Replace(", y=", ",");
@@ -1508,30 +1525,26 @@ object JsonToObject(JsonNode node)
        sensors.Add((sensor[0], sensor[1]));
        beacons.Add((beacon[0], beacon[1]));
     }
+    
+    fr.Close();
 
     var ranges = new List<(int minX, int maxX)>();
     for (var i = 0; i < sensors.Count; i++)
     {
-        // see if it can even get to y=2000000
-        // see how far on y=2000000 its x extents can be based on when it would hit a beacon elsewhere
+        // see if it can even get to y=testPosition
+        // see how far on y=testPosition its x extents can be based on when it would hit a beacon elsewhere
 
         var sensor = sensors[i];
         var beacon = beacons[i];
         
-        Console.WriteLine($"sensor: {sensor.ToString()}, beacon: {sensor.ToString()}");
-
         var maxX = Math.Abs(beacon.x - sensor.x);
         var maxY = Math.Abs(beacon.y - sensor.y);
 
-        Console.WriteLine($"maxX: {maxX}, maxY: {maxY} = {maxX + maxY}");
+        var distanceToTest = Math.Abs(testPosition - sensor.y);
 
-        var distanceTo2M = Math.Abs(2000000 - sensor.y);
-
-        Console.WriteLine($"distanceTo2M: {distanceTo2M}");
-
-        if (distanceTo2M < maxX + maxY)
+        if (distanceToTest < maxX + maxY)
         {
-            var range = (maxX + maxY) - distanceTo2M - 1;
+            var range = (maxX + maxY) - distanceToTest;
 
             var minRangeX = sensor.x - range;
             var maxRangeX = sensor.x + range;
@@ -1540,51 +1553,118 @@ object JsonToObject(JsonNode node)
     }
 
     ranges = ranges.OrderBy(i => i.minX).ToList();
-
-    Console.WriteLine(ranges.Count.ToString());
-
-    var combinedRanges = new List<(int minX, int maxX)>();
-    foreach (var range in ranges)
+    
+    var total = ranges[0].maxX - ranges[0].minX;
+    var lastMaxX = ranges[0].maxX;
+    foreach (var range in ranges.Skip(1))
     {
-        Console.WriteLine(range.ToString());
-        var existingRange =
-            combinedRanges.Find(i => i.minX <= range.minX && range.maxX > i.maxX);
-        Console.WriteLine(existingRange.ToString());
-        if (existingRange == null)
+        if (range.maxX < lastMaxX)
         {
-            
+            continue;
         }
-        // if (existingRange.ToString())
-        // {
-        //     combinedRanges.Remove(existingRange);
-        //     combinedRanges.Add(existingRange.Start.Value..range.End.Value);
-        // }
-        // else
-        // {
-        //     combinedRanges.Add(range.Start.Value..range.End.Value);
-        // }
+
+        if (range.minX > lastMaxX)
+        {
+            lastMaxX = range.minX;
+        }
+
+        total += range.maxX - lastMaxX;
+        lastMaxX = range.maxX;
     }
-
-    fr.Close();
     
-    
-
-    Console.WriteLine($"Day 15 part 1: {0}");
+    Console.WriteLine($"Day 15 part 1: {total}");
 }
 
 // Day 15 (second star answer)
 {
     var fr = new StreamReader(File.Open("input-day15.txt", FileMode.Open));
 
+    var sensors = new List<(int x, int y)>();
+    var beacons = new List<(int x, int y)>();
+    var maxXY = 4000000;
+
+    // var testData = (string[])("Sensor at x=2, y=18: closest beacon is at x=-2, y=15\n" +
+    //     "Sensor at x=9, y=16: closest beacon is at x=10, y=16\n" +
+    //     "Sensor at x=13, y=2: closest beacon is at x=15, y=3\n" +
+    //     "Sensor at x=12, y=14: closest beacon is at x=10, y=16\n" +
+    //     "Sensor at x=10, y=20: closest beacon is at x=10, y=16\n" +
+    //     "Sensor at x=14, y=17: closest beacon is at x=10, y=16\n" +
+    //     "Sensor at x=8, y=7: closest beacon is at x=2, y=10\n" +
+    //     "Sensor at x=2, y=0: closest beacon is at x=2, y=10\n" +
+    //     "Sensor at x=0, y=11: closest beacon is at x=2, y=10\n" +
+    //     "Sensor at x=20, y=14: closest beacon is at x=25, y=17\n" +
+    //     "Sensor at x=17, y=20: closest beacon is at x=21, y=22\n" +
+    //     "Sensor at x=16, y=7: closest beacon is at x=15, y=3\n" +
+    //     "Sensor at x=14, y=3: closest beacon is at x=15, y=3\n" +
+    //     "Sensor at x=20, y=1: closest beacon is at x=15, y=3").Split("\n", StringSplitOptions.TrimEntries);
     while (!fr.EndOfStream)
+    // foreach(var t in testData)
     {
-        var data = fr.ReadLine();
+       var data = fr.ReadLine();
+       // var data = t;
 
+       data = data.Replace("Sensor at x=", "");
+       data = data.Replace(", y=", ",");
+       data = data.Replace(" closest beacon is at x=", "");
+
+       var sensorBeaconSplit = data.Split(":");
+       var sensor = sensorBeaconSplit[0].Split(",").Select(int.Parse).ToArray();
+       var beacon = sensorBeaconSplit[1].Split(",").Select(int.Parse).ToArray();
+
+       sensors.Add((sensor[0], sensor[1]));
+       beacons.Add((beacon[0], beacon[1]));
     }
-
+        
     fr.Close();
     
-    Console.WriteLine($"Day 15 part 2: {0}");
+    long total = -1;
+    for (var testY = 0; testY <= maxXY; testY++)
+    {
+        var ranges = new List<(int minX, int maxX)>();
+        for (var i = 0; i < sensors.Count; i++)
+        {
+            // see if it can even get to y=testPosition
+            // see how far on y=testPosition its x extents can be based on when it would hit a beacon elsewhere
+
+            var sensor = sensors[i];
+            var beacon = beacons[i];
+
+            var maxX = Math.Abs(beacon.x - sensor.x);
+            var maxY = Math.Abs(beacon.y - sensor.y);
+
+            var distanceToTest = Math.Abs(testY - sensor.y);
+
+            if (distanceToTest < maxX + maxY)
+            {
+                var range = (maxX + maxY) - distanceToTest;
+
+                var minRangeX = sensor.x - range;
+                var maxRangeX = sensor.x + range;
+                ranges.Add((minRangeX, maxRangeX));
+            }
+        }
+
+        ranges = ranges.OrderBy(r => r.minX).ToList();
+        var lastMaxX = ranges[0].maxX;
+        foreach (var range in ranges.Skip(1))
+        {
+            if (range.minX > 0 && range.minX <= maxXY && range.minX == lastMaxX + 2)
+            {
+                long missingX = range.minX - 1;
+                total = missingX * maxXY + testY;
+                break;
+            }
+
+            lastMaxX = Math.Max(range.maxX, lastMaxX);
+        }
+        
+        if (total != -1)
+        {
+            break;
+        }
+    }
+    
+    Console.WriteLine($"Day 15 part 2: {total}");
 }
 
 // Day 16 (first star answer)

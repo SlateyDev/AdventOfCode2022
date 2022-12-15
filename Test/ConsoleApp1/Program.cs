@@ -1490,13 +1490,84 @@ object JsonToObject(JsonNode node)
 {
     var fr = new StreamReader(File.Open("input-day15.txt", FileMode.Open));
 
+    var sensors = new List<(int x, int y)>();
+    var beacons = new List<(int x, int y)>();
+
     while (!fr.EndOfStream)
     {
-        var data = fr.ReadLine();
+       var data = fr.ReadLine();
 
+       data = data.Replace("Sensor at x=", "");
+       data = data.Replace(", y=", ",");
+       data = data.Replace(" closest beacon is at x=", "");
+
+       var sensorBeaconSplit = data.Split(":");
+       var sensor = sensorBeaconSplit[0].Split(",").Select(int.Parse).ToArray();
+       var beacon = sensorBeaconSplit[1].Split(",").Select(int.Parse).ToArray();
+
+       sensors.Add((sensor[0], sensor[1]));
+       beacons.Add((beacon[0], beacon[1]));
+    }
+
+    var ranges = new List<(int minX, int maxX)>();
+    for (var i = 0; i < sensors.Count; i++)
+    {
+        // see if it can even get to y=2000000
+        // see how far on y=2000000 its x extents can be based on when it would hit a beacon elsewhere
+
+        var sensor = sensors[i];
+        var beacon = beacons[i];
+        
+        Console.WriteLine($"sensor: {sensor.ToString()}, beacon: {sensor.ToString()}");
+
+        var maxX = Math.Abs(beacon.x - sensor.x);
+        var maxY = Math.Abs(beacon.y - sensor.y);
+
+        Console.WriteLine($"maxX: {maxX}, maxY: {maxY} = {maxX + maxY}");
+
+        var distanceTo2M = Math.Abs(2000000 - sensor.y);
+
+        Console.WriteLine($"distanceTo2M: {distanceTo2M}");
+
+        if (distanceTo2M < maxX + maxY)
+        {
+            var range = (maxX + maxY) - distanceTo2M - 1;
+
+            var minRangeX = sensor.x - range;
+            var maxRangeX = sensor.x + range;
+            ranges.Add((minRangeX, maxRangeX));
+        }
+    }
+
+    ranges = ranges.OrderBy(i => i.minX).ToList();
+
+    Console.WriteLine(ranges.Count.ToString());
+
+    var combinedRanges = new List<(int minX, int maxX)>();
+    foreach (var range in ranges)
+    {
+        Console.WriteLine(range.ToString());
+        var existingRange =
+            combinedRanges.Find(i => i.minX <= range.minX && range.maxX > i.maxX);
+        Console.WriteLine(existingRange.ToString());
+        if (existingRange == null)
+        {
+            
+        }
+        // if (existingRange.ToString())
+        // {
+        //     combinedRanges.Remove(existingRange);
+        //     combinedRanges.Add(existingRange.Start.Value..range.End.Value);
+        // }
+        // else
+        // {
+        //     combinedRanges.Add(range.Start.Value..range.End.Value);
+        // }
     }
 
     fr.Close();
+    
+    
 
     Console.WriteLine($"Day 15 part 1: {0}");
 }

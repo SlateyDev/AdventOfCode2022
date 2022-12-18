@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Nodes;
+﻿using System.Reflection.Metadata.Ecma335;
+using System.Text.Json.Nodes;
 using ConsoleApp1;
 
 // Day 1 (first star answer)
@@ -1669,16 +1670,51 @@ object JsonToObject(JsonNode node)
 
 // Day 16 (first star answer)
 {
-    var fr = new StreamReader(File.Open("input-day16.txt", FileMode.Open));
+    var testData = (string[])("Valve AA has flow rate=0; tunnels lead to valves DD, II, BB\n" +
+                              "Valve BB has flow rate=13; tunnels lead to valves CC, AA\n" +
+                              "Valve CC has flow rate=2; tunnels lead to valves DD, BB\n" +
+                              "Valve DD has flow rate=20; tunnels lead to valves CC, AA, EE\n" +
+                              "Valve EE has flow rate=3; tunnels lead to valves FF, DD\n" +
+                              "Valve FF has flow rate=0; tunnels lead to valves EE, GG\n" +
+                              "Valve GG has flow rate=0; tunnels lead to valves FF, HH\n" +
+                              "Valve HH has flow rate=22; tunnel leads to valve GG\n" +
+                              "Valve II has flow rate=0; tunnels lead to valves AA, JJ\n" +
+                              "Valve JJ has flow rate=21; tunnel leads to valve II\n").Split("\n", StringSplitOptions.RemoveEmptyEntries);
+    // var fr = new StreamReader(File.Open("input-day16.txt", FileMode.Open));
 
-    while (!fr.EndOfStream)
+    var valves = new List<Valve>();
+    // while (!fr.EndOfStream)
+    foreach (var line in testData)
     {
-        var data = fr.ReadLine();
+        // var data = fr.ReadLine();
+        var data = line
+            .Replace(", ", ",")
+            .Replace("Valve ", "")
+            .Replace(" has flow rate=", ",")
+            .Replace("; tunnel leads to valve", "")
+            .Replace("; tunnels lead to valves", "");
 
+        var splitData = data.Split(" ");
+        var lineDetail = splitData[0].Split(",");
+        var lineValves = splitData[1].Split(",");
+        valves.Add(new Valve
+        {
+            valve = lineDetail[0],
+            flow = int.Parse(lineDetail[1]),
+            destinations = lineValves.ToList()
+        });
+    }
+    // fr.Close();
+
+    foreach (var valve in valves)
+    {
+        valve.valves.AddRange(valve.destinations.Select(d => valves.Find(v => v.valve == d)).ToList());
     }
 
-    fr.Close();
-
+    var valveAA = valves.Find(i => i.valve == "AA");
+    
+    
+    
     Console.WriteLine($"Day 16 part 1: {0}");
 }
 
@@ -1697,32 +1733,207 @@ object JsonToObject(JsonNode node)
     Console.WriteLine($"Day 16 part 2: {0}");
 }
 
+long rockFallSimulation(char[] jets, long height)
+{
+    var rocks = new List<List<string>>
+    {
+        new()
+        {
+            "####",
+        },
+        new()
+        {
+            ".#",
+            "###",
+            ".#",
+        },
+        new()
+        {
+            "..#",
+            "..#",
+            "###",
+        },
+        new()
+        {
+            "#",
+            "#",
+            "#",
+            "#",
+        },
+        new()
+        {
+            "##",
+            "##",
+        },
+    };
+
+    var pit = new List<string>();
+
+    var jetIndex = 0;
+    long extraY = 0;
+    for (var rockIndex = 0; rockIndex < height; rockIndex++)
+    {
+        var fallingRockIndex = rockIndex % rocks.Count;
+        var rockX = 2;
+        var rockWidth = rocks[fallingRockIndex].Select(r => r.Length).Max();
+        var rockY = pit.Count + 3;
+
+        //Simulate rock falling
+        var rock = rocks[fallingRockIndex].ToList();
+        rock.Reverse();
+
+        var resting = false;
+        while (!resting)
+        {
+            var jetLeft = jets[jetIndex] == '<';
+            jetIndex = (jetIndex + 1) % jets.Length;
+
+            //Move on X
+            if (jetLeft)
+            {
+                var collided = rockX == 0;
+                if (!collided && rockY < pit.Count)
+                {
+                    for (var rockLineIndex = 0;
+                         rockLineIndex < rock.Count && rockY + rockLineIndex < pit.Count;
+                         rockLineIndex++)
+                    {
+                        var leftSide = rockX + rock[rockLineIndex].IndexOf("#", StringComparison.Ordinal);
+                        if (pit[rockY + rockLineIndex][leftSide - 1] != '.')
+                        {
+                            collided = true;
+                            break;
+                        }
+                    }
+                }
+                if (!collided)
+                {
+                    rockX--;
+                }
+            }
+            else
+            {
+                var collided = rockX + rockWidth > 6;
+                if (!collided && rockY < pit.Count)
+                {
+                    for (var rockLineIndex = 0;
+                         rockLineIndex < rock.Count && rockY + rockLineIndex < pit.Count;
+                         rockLineIndex++)
+                    {
+                        var rightSide = rockX + rock[rockLineIndex].LastIndexOf("#", StringComparison.Ordinal);
+                        if (pit[rockY + rockLineIndex][rightSide + 1] != '.')
+                        {
+                            collided = true;
+                            break;
+                        }
+                    }
+                }
+                if (!collided)
+                {
+                    rockX++;
+                }
+            }
+
+            //Move on Y (rest if cannot move)
+            if (rockY == 0)
+            {
+                resting = true;
+            }
+            if (!resting && rockY <= pit.Count)
+            {
+                for (var rockLineIndex = 0;
+                     rockLineIndex < rock.Count && rockY + rockLineIndex <= pit.Count;
+                     rockLineIndex++)
+                {
+                    for (var rockLineX = 0; rockLineX < rock[rockLineIndex].Length; rockLineX++)
+                    {
+                        if (rock[rockLineIndex][rockLineX] == '#')
+                        {
+                            if (pit[rockY + rockLineIndex - 1][rockX + rockLineX] != '.')
+                            {
+                                resting = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (resting)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            if (!resting)
+            {
+                rockY--;
+            }
+            else
+            {
+                for (var rockLineIndex = 0;
+                     rockLineIndex < rock.Count;
+                     rockLineIndex++)
+                {
+                    if (pit.Count <= rockY + rockLineIndex)
+                    {
+                        pit.Add(".......");
+                    }
+
+                    if (pit.Count > 200)
+                    {
+                        extraY += 100;
+                        rockY -= 100;
+                        pit = pit.Skip(100).ToList();
+                    }
+
+                    //Edit the line
+                    for (var x = 0; x < rock[rockLineIndex].Length; x++)
+                    {
+                        if (rock[rockLineIndex][x] == '#')
+                        {
+                            pit[rockY + rockLineIndex] = pit[rockY + rockLineIndex].Substring(0, rockX + x) + (char)(fallingRockIndex + '1') + pit[rockY + rockLineIndex].Substring(rockX + x + 1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    return extraY + pit.Count;
+}
 // Day 17 (first star answer)
 {
     var fr = new StreamReader(File.Open("input-day17.txt", FileMode.Open));
 
-    while (!fr.EndOfStream)
-    {
-        var data = fr.ReadLine();
-
-    }
+    var jets = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>".ToCharArray();
+    // while (!fr.EndOfStream)
+    // {
+    //     var data = fr.ReadLine();
+    //     jets = data.ToCharArray();
+    // }
 
     fr.Close();
 
-    Console.WriteLine($"Day 17 part 1: {0}");
+    var total = rockFallSimulation(jets, 2022);
+    
+    Console.WriteLine($"Day 17 part 1: {total}");
 }
 
 // Day 17 (second star answer)
 {
     var fr = new StreamReader(File.Open("input-day17.txt", FileMode.Open));
 
-    while (!fr.EndOfStream)
-    {
-        var data = fr.ReadLine();
-
-    }
+    var jets = ">>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>".ToCharArray();
+    // while (!fr.EndOfStream)
+    // {
+    //     var data = fr.ReadLine();
+    //     jets = data.ToCharArray();
+    // }
 
     fr.Close();
+
+    //Obviously this won't work. 1 trillion iterations would take forever and use a lot of memory.
+    //How could the algorithm be improved?
+    // var total = rockFallSimulation(jets, 1000000000000);
     
     Console.WriteLine($"Day 17 part 2: {0}");
 }
